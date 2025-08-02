@@ -169,24 +169,27 @@ main {
 
 .input-grid {
     display: grid;
-    gap: 8px;
-    margin-bottom: 30px;
+    gap: 6px;
+    margin: 0 auto 25px auto;
     justify-content: center;
+    justify-self: center;
     max-width: 100%;
     padding: 0 10px;
+    width: fit-content;
 }
 
 .input-grid input {
-    padding: 8px 4px;
+    padding: 6px 3px;
     border: 2px solid #ddd;
     border-radius: 6px;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     transition: border-color 0.3s ease;
     min-width: 0;
     width: 100%;
-    max-width: 120px;
-    min-height: 40px;
+    max-width: 90px;
+    min-height: 32px;
+    aspect-ratio: 1;
 }
 
 .input-grid input:focus {
@@ -201,14 +204,14 @@ main {
 }
 
 /* Dynamic sizing for different grid sizes */
-.input-grid[data-size="3"] input { max-width: 150px; font-size: 0.9rem; }
-.input-grid[data-size="4"] input { max-width: 130px; font-size: 0.85rem; }
-.input-grid[data-size="5"] input { max-width: 120px; font-size: 0.8rem; }
-.input-grid[data-size="6"] input { max-width: 100px; font-size: 0.75rem; }
-.input-grid[data-size="7"] input { max-width: 90px; font-size: 0.7rem; }
-.input-grid[data-size="8"] input { max-width: 80px; font-size: 0.65rem; }
-.input-grid[data-size="9"] input { max-width: 75px; font-size: 0.6rem; }
-.input-grid[data-size="10"] input { max-width: 70px; font-size: 0.6rem; }
+.input-grid[data-size="3"] input { max-width: 110px; font-size: 0.85rem; }
+.input-grid[data-size="4"] input { max-width: 95px; font-size: 0.8rem; }
+.input-grid[data-size="5"] input { max-width: 90px; font-size: 0.75rem; }
+.input-grid[data-size="6"] input { max-width: 85px; font-size: 0.72rem; }
+.input-grid[data-size="7"] input { max-width: 80px; font-size: 0.7rem; }
+.input-grid[data-size="8"] input { max-width: 75px; font-size: 0.68rem; }
+.input-grid[data-size="9"] input { max-width: 70px; font-size: 0.65rem; }
+.input-grid[data-size="10"] input { max-width: 68px; font-size: 0.62rem; }
 
 .generate-section {
     text-align: center;
@@ -640,13 +643,15 @@ main {
     .input-grid {
         gap: 5px;
         padding: 0 5px;
+        margin: 0 auto 20px auto;
+        width: fit-content;
     }
     
     .input-grid input {
-        padding: 6px 2px;
-        font-size: 0.7rem;
-        min-height: 35px;
-        max-width: 80px;
+        padding: 5px 2px;
+        font-size: 0.65rem;
+        min-height: 28px;
+        max-width: 60px;
     }
     
     .win-status {
