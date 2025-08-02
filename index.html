@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Card Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Bingo Card Generator</h1>
+            <p>Create custom bingo cards and download them as a zip file!</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="generator">Generate Cards</button>
+            <button class="tab-button" data-tab="player">Play Bingo</button>
+        </nav>
+
+        <main>
+            <div id="generator" class="tab-content active">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="cardSize">Card Size:</label>
+                    <select id="cardSize">
+                        <option value="3">3x3</option>
+                        <option value="4">4x4</option>
+                        <option value="5" selected>5x5</option>
+                        <option value="6">6x6</option>
+                        <option value="7">7x7</option>
+                        <option value="8">8x8</option>
+                        <option value="9">9x9</option>
+                        <option value="10">10x10</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="numCards">Number of Cards:</label>
+                    <input type="number" id="numCards" min="1" max="50" value="5">
+                </div>
+
+                <div class="control-group">
+                    <label for="freeText">Center Square Text:</label>
+                    <input type="text" id="freeText" value="FREE" placeholder="FREE" maxlength="20">
+                    <small>Text for the center square (odd-sized grids only)</small>
+                </div>
+
+                <div class="control-group">
+                    <label for="cardTitle">Card Title (Optional):</label>
+                    <input type="text" id="cardTitle" placeholder="e.g. John's Bingo #1, Weekly Bingo" maxlength="50">
+                    <small>Custom title for your bingo cards</small>
+                </div>
+
+                <button id="generateGrid" class="btn btn-primary">Generate Input Grid</button>
+            </div>
+
+            <div id="inputGrid" class="input-grid"></div>
+
+            <div id="generateSection" class="generate-section" style="display: none;">
+                <button id="generateCards" class="btn btn-success">Generate Cards & Show Preview</button>
+                <div id="loadingSpinner" class="spinner" style="display: none;">
+                    <div class="spinner-ring"></div>
+                    <p>Generating cards...</p>
+                </div>
+            </div>
+
+            <div id="preview" class="preview-section"></div>
+            </div>
+
+            <div id="player" class="tab-content">
+                <div class="upload-section" id="dropZone">
+                    <h2>Upload Your Bingo Card</h2>
+                    <div class="drag-drop-area">
+                        <div class="drag-drop-icon">📁</div>
+                        <p class="drag-drop-text">Drag & drop your bingo card files here</p>
+                        <p class="drag-drop-or">or</p>
+                        <button id="uploadButton" class="btn btn-primary">Choose Bingo Card File</button>
+                        <div id="fileName" class="file-name"></div>
+                        <small>Supports .html and .bingo files</small>
+                    </div>
+                    <input type="file" id="fileUpload" accept=".html,.bingo" style="display: none;">
+                </div>
+
+                <div id="gameArea" class="game-area" style="display: none;">
+                    <div class="game-controls">
+                        <button id="resetGame" class="btn btn-secondary">Reset Game</button>
+                        <button id="checkWin" class="btn btn-success">Check for Bingo!</button>
+                        <div id="winStatus" class="win-status"></div>
+                    </div>
+                    
+                    <div id="playableCard" class="playable-card"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
