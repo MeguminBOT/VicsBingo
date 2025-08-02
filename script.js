@@ -9,6 +9,7 @@ class BingoCardGenerator {
         this.initializeEventListeners();
         this.initializeTabs();
         this.initializeGamePlayer();
+        this.initializeThemeToggle();
     }
 
     initializeTabs() {
@@ -1227,6 +1228,33 @@ Generated on: ${new Date().toLocaleString()}
                 font-size: 1rem;
             }
         `;
+    }
+
+    initializeThemeToggle() {
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('.theme-icon');
+        
+        // Check for saved theme preference or default to light mode
+        const savedTheme = localStorage.getItem('bingoTheme') || 'light';
+        this.setTheme(savedTheme);
+        
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            this.setTheme(newTheme);
+            localStorage.setItem('bingoTheme', newTheme);
+        });
+    }
+
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const themeIcon = document.querySelector('.theme-icon');
+        
+        if (theme === 'dark') {
+            themeIcon.textContent = '☀️';
+        } else {
+            themeIcon.textContent = '🌙';
+        }
     }
 }
 

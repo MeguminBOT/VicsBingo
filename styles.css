@@ -1,3 +1,47 @@
+:root {
+    /* Light mode colors */
+    --bg-gradient-start: #667eea;
+    --bg-gradient-end: #764ba2;
+    --bg-primary: white;
+    --text-primary: #333;
+    --text-secondary: #555;
+    --text-muted: #888;
+    --border-color: #ddd;
+    --border-focus: #667eea;
+    --card-bg: white;
+    --shadow: rgba(0,0,0,0.2);
+    --shadow-light: rgba(0,0,0,0.1);
+    --hover-bg: #f0f0f0;
+    --center-gradient-start: #ffd89b;
+    --center-gradient-end: #19547b;
+    --upload-border: #ddd;
+    --upload-bg-hover: rgba(102, 126, 234, 0.1);
+    --miniature-bg: #f8f9fa;
+    --header-text: white;
+}
+
+[data-theme="dark"] {
+    /* Dark mode colors */
+    --bg-gradient-start: #2c3e50;
+    --bg-gradient-end: #34495e;
+    --bg-primary: #2c3e50;
+    --text-primary: #ecf0f1;
+    --text-secondary: #bdc3c7;
+    --text-muted: #95a5a6;
+    --border-color: #4a5568;
+    --border-focus: #667eea;
+    --card-bg: #34495e;
+    --shadow: rgba(0,0,0,0.4);
+    --shadow-light: rgba(0,0,0,0.3);
+    --hover-bg: #3a4d5c;
+    --center-gradient-start: #e67e22;
+    --center-gradient-end: #2980b9;
+    --upload-border: #4a5568;
+    --upload-bg-hover: rgba(102, 126, 234, 0.2);
+    --miniature-bg: #3a4d5c;
+    --header-text: #ecf0f1;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,21 +51,93 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     min-height: 100vh;
+    transition: all 0.3s ease;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    position: relative;
+}
+
+.header-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+}
+
+.github-link {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--header-text);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.github-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+    color: var(--header-text);
+}
+
+.github-link svg {
+    width: 24px;
+    height: 24px;
+}
+
+.theme-toggle {
+    position: relative;
+}
+
+.theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.theme-icon {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+[data-theme="dark"] .theme-icon {
+    transform: rotate(180deg);
 }
 
 header {
     text-align: center;
     margin-bottom: 30px;
-    color: white;
+    color: var(--header-text);
+    margin-top: 40px;
 }
 
 header h1 {
@@ -46,7 +162,7 @@ header p {
     padding: 12px 24px;
     border: none;
     background: rgba(255, 255, 255, 0.2);
-    color: white;
+    color: var(--header-text);
     border-radius: 8px 8px 0 0;
     cursor: pointer;
     font-size: 1rem;
@@ -59,8 +175,8 @@ header p {
 }
 
 .tab-button.active {
-    background: white;
-    color: #333;
+    background: var(--card-bg);
+    color: var(--text-primary);
 }
 
 .tab-content {
@@ -72,11 +188,12 @@ header p {
 }
 
 main {
-    background: white;
+    background: var(--card-bg);
     border-radius: 15px;
     padding: 30px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px var(--shadow);
     overflow-x: auto;
+    transition: all 0.3s ease;
 }
 
 .controls {
@@ -101,27 +218,29 @@ main {
 
 .control-group label {
     font-weight: 600;
-    color: #555;
+    color: var(--text-secondary);
 }
 
 .control-group select,
 .control-group input {
     padding: 10px;
-    border: 2px solid #ddd;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    background: var(--card-bg);
+    color: var(--text-primary);
 }
 
 .control-group select:focus,
 .control-group input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--border-focus);
 }
 
 .control-group small {
     font-size: 0.8rem;
-    color: #888;
+    color: var(--text-muted);
     margin-top: 2px;
 }
 
@@ -180,7 +299,7 @@ main {
 
 .input-grid input {
     padding: 6px 3px;
-    border: 2px solid #ddd;
+    border: 2px solid var(--border-color);
     border-radius: 6px;
     text-align: center;
     font-size: 0.75rem;
@@ -190,15 +309,17 @@ main {
     max-width: 90px;
     min-height: 32px;
     aspect-ratio: 1;
+    background: var(--card-bg);
+    color: var(--text-primary);
 }
 
 .input-grid input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--border-focus);
 }
 
 .input-grid input.center-cell {
-    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+    background: linear-gradient(135deg, var(--center-gradient-start) 0%, var(--center-gradient-end) 100%);
     color: white;
     font-weight: bold;
 }
@@ -243,21 +364,21 @@ main {
 .upload-section {
     text-align: center;
     padding: 40px 20px;
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--upload-border);
     border-radius: 10px;
     margin-bottom: 30px;
     transition: all 0.3s ease;
 }
 
 .upload-section.drag-over {
-    border-color: #667eea;
-    background-color: rgba(102, 126, 234, 0.1);
+    border-color: var(--border-focus);
+    background-color: var(--upload-bg-hover);
     transform: scale(1.02);
 }
 
 .upload-section h2 {
     margin-bottom: 10px;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .drag-drop-area {
@@ -275,12 +396,12 @@ main {
 
 .drag-drop-text {
     font-size: 1.1rem;
-    color: #555;
+    color: var(--text-secondary);
     margin: 0;
 }
 
 .drag-drop-or {
-    color: #888;
+    color: var(--text-muted);
     font-style: italic;
     margin: 0;
 }
@@ -294,7 +415,7 @@ main {
 
 .file-name {
     font-style: italic;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .game-area {
@@ -345,7 +466,7 @@ main {
 }
 
 .playable-bingo-cell {
-    background: white;
+    background: var(--card-bg);
     padding: 15px 5px;
     text-align: center;
     font-size: 0.8rem;
@@ -359,14 +480,15 @@ main {
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    color: var(--text-primary);
 }
 
 .playable-bingo-cell:hover {
-    background: #f0f0f0;
+    background: var(--hover-bg);
 }
 
 .playable-bingo-cell.center {
-    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+    background: linear-gradient(135deg, var(--center-gradient-start) 0%, var(--center-gradient-end) 100%);
     color: white;
     font-weight: bold;
     font-size: 1rem;
@@ -394,7 +516,7 @@ main {
     text-align: center;
     margin-bottom: 20px;
     font-size: 1.5rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .card-selection {
@@ -404,12 +526,12 @@ main {
 
 .card-selection h3 {
     margin-bottom: 10px;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .card-selection p {
     margin-bottom: 20px;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .card-buttons {
@@ -430,27 +552,28 @@ main {
 }
 
 .preview-card {
-    background: white;
-    border: 2px solid #333;
+    background: var(--card-bg);
+    border: 2px solid var(--text-primary);
     border-radius: 10px;
     padding: 20px;
     margin: 20px auto;
     max-width: 600px;
     page-break-after: always;
+    transition: all 0.3s ease;
 }
 
 .preview-card h3 {
     text-align: center;
     margin-bottom: 20px;
     font-size: 1.5rem;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .bingo-card {
     display: grid;
     gap: 2px;
-    background: #333;
-    border: 3px solid #333;
+    background: var(--text-primary);
+    border: 3px solid var(--text-primary);
     border-radius: 10px;
     overflow: hidden;
     margin: 0 auto;
@@ -458,7 +581,7 @@ main {
 }
 
 .bingo-cell {
-    background: white;
+    background: var(--card-bg);
     padding: 15px 5px;
     text-align: center;
     font-size: 0.8rem;
@@ -469,10 +592,11 @@ main {
     min-height: 60px;
     word-wrap: break-word;
     hyphens: auto;
+    color: var(--text-primary);
 }
 
 .bingo-cell.center {
-    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+    background: linear-gradient(135deg, var(--center-gradient-start) 0%, var(--center-gradient-end) 100%);
     color: white;
     font-weight: bold;
     font-size: 1rem;
@@ -490,21 +614,21 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #f8f9fa;
+    background: var(--miniature-bg);
     border-radius: 12px;
     padding: 15px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px var(--shadow-light);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .preview-miniature:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 6px 16px var(--shadow);
 }
 
 .preview-card.miniature {
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 12px;
     margin: 0 0 15px 0;
@@ -517,14 +641,15 @@ main {
     text-align: center;
     margin-bottom: 12px;
     font-size: 0.9rem;
-    color: #333;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
 .bingo-card.miniature {
     max-width: 200px;
     gap: 1px;
-    border: 2px solid #333;
+    border: 2px solid var(--text-primary);
+    background: var(--text-primary);
 }
 
 .bingo-card.miniature .bingo-cell {
@@ -579,7 +704,7 @@ main {
 
 .bulk-download-section p {
     font-size: 1.1rem;
-    color: #666;
+    color: var(--text-secondary);
     margin-bottom: 15px;
 }
 
@@ -593,16 +718,78 @@ main {
 
 .bulk-download-section .format-selection label {
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .bulk-download-section .format-selection select {
     padding: 8px 12px;
-    border: 2px solid #ddd;
+    border: 2px solid var(--border-color);
     border-radius: 6px;
     font-size: 0.9rem;
-    background: white;
+    background: var(--card-bg);
+    color: var(--text-primary);
     min-width: 200px;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #000;
+        --border-focus: #0066cc;
+        --text-primary: #000;
+        --text-secondary: #333;
+    }
+    
+    [data-theme="dark"] {
+        --border-color: #fff;
+        --border-focus: #66ccff;
+        --text-primary: #fff;
+        --text-secondary: #ccc;
+    }
+}
+
+/* Focus indicators for keyboard navigation */
+.btn:focus,
+.tab-button:focus,
+.theme-toggle-btn:focus,
+.github-link:focus,
+.control-group select:focus,
+.control-group input:focus,
+.playable-bingo-cell:focus {
+    outline: 3px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+/* Improve readability */
+.playable-bingo-cell,
+.bingo-cell {
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Better mobile touch targets */
+@media (max-width: 768px) {
+    .playable-bingo-cell {
+        padding: 12px 5px;
+        min-height: 60px;
+        font-size: 0.75rem;
+    }
+    
+    .bingo-cell {
+        padding: 12px 5px;
+        min-height: 50px;
+        font-size: 0.75rem;
+    }
 }
 
 /* Responsive adjustments */
@@ -611,37 +798,90 @@ main {
         padding: 10px;
     }
     
+    .header-controls {
+        top: 10px;
+        right: 10px;
+        gap: 8px;
+    }
+    
+    .github-link,
+    .theme-toggle-btn {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .github-link svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .theme-icon {
+        font-size: 1.3rem;
+    }
+    
+    header {
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+    
     header h1 {
         font-size: 2rem;
+    }
+    
+    header p {
+        font-size: 1rem;
     }
     
     .tabs {
         flex-direction: column;
         margin-bottom: 15px;
+        gap: 8px;
     }
     
     .tab-button {
         border-radius: 8px;
-        margin-bottom: 5px;
+        margin-bottom: 0;
+        padding: 14px 20px;
+        font-size: 1.1rem;
+    }
+    
+    main {
+        padding: 20px;
+        border-radius: 10px;
     }
     
     .controls {
         grid-template-columns: 1fr;
         align-items: stretch;
+        gap: 15px;
     }
     
     .controls .btn {
         grid-column: 1;
         justify-self: stretch;
+        padding: 14px 24px;
+        font-size: 1.1rem;
+    }
+    
+    .control-group select,
+    .control-group input {
+        padding: 12px;
+        font-size: 1.1rem;
     }
     
     .game-controls {
         flex-direction: column;
         align-items: stretch;
+        gap: 12px;
+    }
+    
+    .game-controls .btn {
+        padding: 14px 24px;
+        font-size: 1.1rem;
     }
     
     .input-grid {
-        gap: 5px;
+        gap: 4px;
         padding: 0 5px;
         margin: 0 auto 20px auto;
         width: fit-content;
@@ -650,17 +890,34 @@ main {
     .input-grid input {
         padding: 5px 2px;
         font-size: 0.65rem;
-        min-height: 28px;
-        max-width: 60px;
+        min-height: 32px;
+        max-width: 65px;
     }
+    
+    /* Adjust grid sizes for mobile */
+    .input-grid[data-size="3"] input { max-width: 80px; font-size: 0.8rem; min-height: 40px; }
+    .input-grid[data-size="4"] input { max-width: 70px; font-size: 0.75rem; min-height: 35px; }
+    .input-grid[data-size="5"] input { max-width: 65px; font-size: 0.7rem; min-height: 32px; }
+    .input-grid[data-size="6"] input { max-width: 55px; font-size: 0.65rem; min-height: 30px; }
+    .input-grid[data-size="7"] input { max-width: 50px; font-size: 0.6rem; min-height: 28px; }
+    .input-grid[data-size="8"] input { max-width: 45px; font-size: 0.55rem; min-height: 26px; }
+    .input-grid[data-size="9"] input { max-width: 40px; font-size: 0.5rem; min-height: 24px; }
+    .input-grid[data-size="10"] input { max-width: 38px; font-size: 0.45rem; min-height: 22px; }
     
     .win-status {
         margin-left: 0;
         margin-top: 10px;
+        padding: 12px 16px;
+        font-size: 1rem;
+    }
+    
+    .upload-section {
+        padding: 30px 15px;
     }
     
     .drag-drop-area {
         padding: 15px;
+        gap: 12px;
     }
     
     .drag-drop-icon {
@@ -671,6 +928,12 @@ main {
         font-size: 1rem;
     }
     
+    .btn {
+        padding: 14px 24px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+    }
+    
     .bingo-cell,
     .playable-bingo-cell {
         font-size: 0.7rem;
@@ -678,8 +941,13 @@ main {
         min-height: 50px;
     }
     
+    .bingo-cell.center,
+    .playable-bingo-cell.center {
+        font-size: 0.9rem;
+    }
+    
     .preview-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 15px;
     }
     
@@ -688,47 +956,198 @@ main {
     }
     
     .preview-card.miniature {
-        max-width: 220px;
+        max-width: 260px;
+    }
+    
+    .bingo-card.miniature {
+        max-width: 200px;
+    }
+    
+    .download-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-small {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+    
+    .bulk-download-section .format-selection {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .bulk-download-section .format-selection select {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 8px;
+    }
+    
+    .header-controls {
+        top: 8px;
+        right: 8px;
+        gap: 6px;
+    }
+    
+    .github-link,
+    .theme-toggle-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .github-link svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .theme-icon {
+        font-size: 1.2rem;
+    }
+    
+    header {
+        margin-top: 25px;
+    }
+    
+    header h1 {
+        font-size: 1.8rem;
+    }
+    
+    header p {
+        font-size: 0.9rem;
+    }
+    
+    main {
+        padding: 15px;
+    }
+    
+    .tab-button {
+        padding: 12px 16px;
+        font-size: 1rem;
+    }
+    
+    .control-group select,
+    .control-group input {
+        padding: 10px;
+        font-size: 1rem;
+    }
+    
+    .input-grid input {
+        max-width: 35px;
+        min-height: 20px;
+        font-size: 0.4rem;
+        padding: 2px 1px;
+    }
+    
+    /* Very small grid adjustments for tiny screens */
+    .input-grid[data-size="3"] input { max-width: 65px; font-size: 0.7rem; min-height: 32px; }
+    .input-grid[data-size="4"] input { max-width: 55px; font-size: 0.65rem; min-height: 28px; }
+    .input-grid[data-size="5"] input { max-width: 50px; font-size: 0.6rem; min-height: 26px; }
+    .input-grid[data-size="6"] input { max-width: 42px; font-size: 0.5rem; min-height: 22px; }
+    .input-grid[data-size="7"] input { max-width: 38px; font-size: 0.45rem; min-height: 20px; }
+    .input-grid[data-size="8"] input { max-width: 35px; font-size: 0.4rem; min-height: 18px; }
+    .input-grid[data-size="9"] input { max-width: 32px; font-size: 0.35rem; min-height: 16px; }
+    .input-grid[data-size="10"] input { max-width: 30px; font-size: 0.3rem; min-height: 15px; }
+    
+    .upload-section {
+        padding: 20px 10px;
+    }
+    
+    .drag-drop-icon {
+        font-size: 1.5rem;
+    }
+    
+    .drag-drop-text {
+        font-size: 0.9rem;
+    }
+    
+    .btn {
+        font-size: 1rem;
+        padding: 12px 20px;
+    }
+    
+    .preview-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .preview-card.miniature {
+        max-width: 240px;
     }
     
     .bingo-card.miniature {
         max-width: 180px;
     }
     
-    .download-buttons {
-        flex-direction: column;
-        gap: 6px;
+    .bingo-card.miniature .bingo-cell {
+        font-size: 0.4rem;
+        padding: 3px 1px;
+        min-height: 16px;
     }
     
-    .btn-small {
-        font-size: 0.75rem;
-        padding: 5px 10px;
+    .bulk-download-section .format-selection select {
+        max-width: 250px;
+        font-size: 1rem;
+        padding: 10px;
     }
 }
 
-@media (max-width: 480px) {
-    .preview-grid {
-        grid-template-columns: 1fr;
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .btn,
+    .tab-button,
+    .theme-toggle-btn,
+    .playable-bingo-cell,
+    .card-select-btn {
+        min-height: 44px;
+        min-width: 44px;
     }
     
-    .preview-card.miniature {
-        max-width: 200px;
+    .control-group select,
+    .control-group input {
+        min-height: 44px;
     }
     
-    .bingo-card.miniature {
-        max-width: 160px;
+    .input-grid input {
+        min-height: 40px;
     }
     
-    .bingo-card.miniature .bingo-cell {
-        font-size: 0.45rem;
-        padding: 4px 1px;
-        min-height: 18px;
+    .playable-bingo-cell {
+        min-height: 60px;
+    }
+    
+    /* Remove hover effects on touch devices */
+    .btn:hover,
+    .tab-button:hover,
+    .theme-toggle-btn:hover,
+    .playable-bingo-cell:hover,
+    .preview-miniature:hover {
+        transform: none;
+        background: initial;
+    }
+    
+    .btn-primary:hover {
+        background: #667eea;
+    }
+    
+    .btn-success:hover {
+        background: #28a745;
+    }
+    
+    .btn-secondary:hover {
+        background: #6c757d;
     }
 }
 
 @media print {
     body {
         background: white;
+        color: black;
     }
     
     .container {
@@ -737,21 +1156,50 @@ main {
         padding: 0;
     }
     
+    .theme-toggle {
+        display: none;
+    }
+    
     main {
         box-shadow: none;
         border-radius: 0;
         padding: 0;
+        background: white;
     }
     
     .controls,
-    .generate-section {
+    .generate-section,
+    .tabs,
+    .upload-section,
+    .game-controls,
+    .bulk-download-section {
         display: none;
     }
     
     .preview-card {
-        border: 2px solid #333;
+        border: 2px solid black;
         margin: 0;
         max-width: none;
         page-break-after: always;
+        background: white;
+    }
+    
+    .preview-card h3 {
+        color: black;
+    }
+    
+    .bingo-card {
+        background: black;
+        border-color: black;
+    }
+    
+    .bingo-cell {
+        background: white;
+        color: black;
+    }
+    
+    .bingo-cell.center {
+        background: #666;
+        color: white;
     }
 }
