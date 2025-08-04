@@ -12,6 +12,10 @@ class BingoCardGenerator {
         this.initializeGamePlayer();
         this.initializeThemeToggle();
         this.initializeInputArea(); // Always show input area
+        this.callerItems = []; // Items available for calling
+        this.calledItems = []; // Items that have been called
+        this.isSpinning = false; // Track if wheel is currently spinning
+        this.resizeListener = null; // Track resize listener for cleanup
     }
 
     initializeTabs() {
@@ -39,6 +43,9 @@ class BingoCardGenerator {
         const resetButton = document.getElementById('resetGame');
         const checkWinButton = document.getElementById('checkWin');
 
+        // Initialize player mode switching
+        this.initializePlayerModes();
+
         uploadButton.addEventListener('click', () => {
             fileUpload.click();
         });
@@ -57,6 +64,9 @@ class BingoCardGenerator {
 
         // Add drag and drop functionality
         this.initializeDragAndDrop();
+        
+        // Initialize caller mode
+        this.initializeCallerMode();
     }
 
     initializeDragAndDrop() {
@@ -999,6 +1009,7 @@ Generated on: ${new Date().toLocaleString()}
                     generatedWith: "Bingo Card Generator"
                 },
                 masterList: values.filter(v => v !== this.freeText),
+                callerList: values.filter(v => v !== this.freeText), // Complete list for caller mode
                 cards: [cardData]
             };
             
@@ -1036,6 +1047,7 @@ Generated on: ${new Date().toLocaleString()}
                         generatedWith: "Bingo Card Generator"
                     },
                     masterList: values.filter(v => v !== this.freeText),
+                    callerList: values.filter(v => v !== this.freeText), // Complete list for caller mode
                     cards: [cardData]
                 };
                 
@@ -1170,6 +1182,7 @@ Generated on: ${new Date().toLocaleString()}
                 generatedWith: "Bingo Card Generator"
             },
             masterList: values.filter(v => v !== this.freeText),
+            callerList: values.filter(v => v !== this.freeText), // Complete list for caller mode
             cards: cards
         };
     }
@@ -1511,6 +1524,7 @@ Generated on: ${new Date().toLocaleString()}
                 generatedWith: "Bingo Card Generator"
             },
             masterList: values.filter(v => v !== this.freeText),
+            callerList: values.filter(v => v !== this.freeText), // Complete list for caller mode
             cards: [cardData]
         };
         
@@ -1573,6 +1587,397 @@ Generated on: ${new Date().toLocaleString()}
                 font-size: 1rem;
             }
         `;
+    }
+
+    initializePlayerModes() {
+        const modeButtons = document.querySelectorAll('.mode-button');
+        const playerModes = document.querySelectorAll('.player-mode');
+
+        modeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetMode = button.getAttribute('data-mode');
+                
+                // Remove active class from all buttons and modes
+                modeButtons.forEach(btn => btn.classList.remove('active'));
+                playerModes.forEach(mode => mode.classList.remove('active'));
+                
+                // Add active class to clicked button and corresponding mode
+                button.classList.add('active');
+                document.getElementById(`${targetMode}-mode`).classList.add('active');
+            });
+        });
+    }
+
+    initializeCallerMode() {
+        const callerUploadButton = document.getElementById('callerUploadButton');
+        const callerFileUpload = document.getElementById('callerFileUpload');
+        const spinButton = document.getElementById('spinButton');
+        const resetCallerButton = document.getElementById('resetCaller');
+        const callerDropZone = document.getElementById('callerDropZone');
+
+        callerUploadButton.addEventListener('click', () => {
+            callerFileUpload.click();
+        });
+
+        callerFileUpload.addEventListener('change', (e) => {
+            this.handleCallerFileUpload(e);
+        });
+
+        spinButton.addEventListener('click', () => {
+            this.spinWheel();
+        });
+
+        resetCallerButton.addEventListener('click', () => {
+            this.resetCaller();
+        });
+
+        // Initialize drag and drop
+        this.initializeCallerDragAndDrop(callerDropZone, callerFileUpload);
+    }
+
+    initializeCallerDragAndDrop(dropZone, fileInput) {
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('drag-over');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('drag-over');
+            });
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.name.toLowerCase().endsWith('.bingo')) {
+                    // Create a mock event object for handleCallerFileUpload
+                    const mockEvent = {
+                        target: {
+                            files: [file]
+                        }
+                    };
+                    this.handleCallerFileUpload(mockEvent);
+                } else {
+                    alert('Please upload a .bingo file. Only .bingo files contain the complete item list for calling.');
+                }
+            }
+        });
+    }
+
+    handleCallerFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.bingo')) {
+            alert('Please upload a .bingo file. Only .bingo files contain the complete item list for calling.');
+            return;
+        }
+
+        const callerFileName = document.getElementById('callerFileName');
+        callerFileName.textContent = `Selected: ${file.name}`;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                this.parseCallerBingoFile(e.target.result, file.name);
+            } catch (error) {
+                alert('Error reading the .bingo file. Please make sure it\'s a valid file.');
+                console.error('Caller file parsing error:', error);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    parseCallerBingoFile(jsonContent, fileName) {
+        try {
+            const bingoData = JSON.parse(jsonContent);
+            
+            if (bingoData.format !== "bingo-card-generator-v1") {
+                throw new Error("Unsupported .bingo file format");
+            }
+            
+            if (!bingoData.callerList || bingoData.callerList.length === 0) {
+                throw new Error("No caller list found in .bingo file");
+            }
+            
+            this.loadCallerItems(bingoData.callerList, bingoData.metadata);
+            
+        } catch (error) {
+            throw new Error(`Invalid .bingo file: ${error.message}`);
+        }
+    }
+
+    loadCallerItems(items, metadata) {
+        this.callerItems = [...items];
+        this.calledItems = [];
+        
+        // Update UI
+        const callerArea = document.getElementById('callerArea');
+        const callerTitle = document.getElementById('callerTitle');
+        
+        callerArea.style.display = 'block';
+        callerTitle.textContent = `Calling: ${metadata.title || 'Bingo Items'}`;
+        
+        this.updateCallerStats();
+        this.createSpinningWheel();
+        this.updateCalledItemsList();
+    }
+
+    createSpinningWheel() {
+        const wheelSegments = document.getElementById('wheelSegments');
+        wheelSegments.innerHTML = '';
+        
+        if (this.callerItems.length === 0) {
+            wheelSegments.innerHTML = '<div class="wheel-empty">No items remaining</div>';
+            return;
+        }
+        
+        const itemsToShow = this.callerItems.length; // Show ALL items, not just 12
+        const anglePerSegment = 360 / itemsToShow;
+        
+        // Create SVG for pie segments
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.style.position = 'absolute';
+        svg.style.top = '0';
+        svg.style.left = '0';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        svg.setAttribute('viewBox', '0 0 400 400');
+        
+        const centerX = 200;
+        const centerY = 200;
+        const radius = 180;
+        
+        for (let i = 0; i < itemsToShow; i++) {
+            // Calculate angles
+            const startAngle = (i * anglePerSegment - 90) * Math.PI / 180; // -90 to start from top
+            const endAngle = ((i + 1) * anglePerSegment - 90) * Math.PI / 180;
+            
+            // Calculate path coordinates
+            const x1 = centerX + radius * Math.cos(startAngle);
+            const y1 = centerY + radius * Math.sin(startAngle);
+            const x2 = centerX + radius * Math.cos(endAngle);
+            const y2 = centerY + radius * Math.sin(endAngle);
+            
+            const largeArcFlag = anglePerSegment > 180 ? 1 : 0;
+            
+            // Create SVG path for pie segment
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const pathData = `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+            path.setAttribute('d', pathData);
+            
+            // Generate a bright, distinct color for each segment
+            const hue = (i * 360) / itemsToShow;
+            const saturation = 70 + (i % 3) * 10;
+            const lightness = 45 + (i % 2) * 10;
+            path.setAttribute('fill', `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+            path.setAttribute('stroke', '#fff');
+            path.setAttribute('stroke-width', '2');
+            
+            svg.appendChild(path);
+            
+            // Create text label
+            const textAngle = (i + 0.5) * anglePerSegment - 90; // Center of segment
+            const textRadius = radius * 0.7; // Position text at 70% of radius
+            const textX = centerX + textRadius * Math.cos(textAngle * Math.PI / 180);
+            const textY = centerY + textRadius * Math.sin(textAngle * Math.PI / 180);
+            
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', textX);
+            text.setAttribute('y', textY);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'middle');
+            text.setAttribute('fill', 'white');
+            
+            // Adjust font size based on number of items and segment size
+            let fontSize = 12;
+            if (itemsToShow > 20) fontSize = 10;
+            if (itemsToShow > 40) fontSize = 8;
+            if (itemsToShow > 60) fontSize = 6;
+            
+            text.setAttribute('font-size', fontSize);
+            text.setAttribute('font-weight', 'bold');
+            text.style.filter = 'drop-shadow(1px 1px 2px rgba(0,0,0,0.8))';
+            
+            // Rotate text if needed for better readability
+            if (textAngle > 90 && textAngle < 270) {
+                text.setAttribute('transform', `rotate(${textAngle + 180} ${textX} ${textY})`);
+            } else {
+                text.setAttribute('transform', `rotate(${textAngle} ${textX} ${textY})`);
+            }
+            
+            text.textContent = this.callerItems[i];
+            svg.appendChild(text);
+        }
+        
+        wheelSegments.appendChild(svg);
+    }
+
+    spinWheel() {
+        if (this.isSpinning || this.callerItems.length === 0) return;
+        
+        this.isSpinning = true;
+        const spinButton = document.getElementById('spinButton');
+        spinButton.disabled = true;
+        spinButton.textContent = '🌀';
+        
+        const wheel = document.getElementById('spinningWheel');
+        
+        // Add spinning class for animation
+        wheel.classList.add('spinning');
+        
+        // Calculate random rotation (multiple full spins + random position)
+        const minSpins = 3;
+        const maxSpins = 6;
+        const spins = minSpins + Math.random() * (maxSpins - minSpins);
+        const finalAngle = Math.random() * 360;
+        const totalRotation = (spins * 360) + finalAngle;
+        
+        // Apply rotation
+        wheel.style.transform = `rotate(${totalRotation}deg)`;
+        
+        // After animation completes
+        setTimeout(() => {
+            this.selectWinningItem(finalAngle);
+            this.isSpinning = false;
+            spinButton.disabled = false;
+            spinButton.textContent = '🎯 SPIN';
+            wheel.classList.remove('spinning');
+        }, 3000);
+    }
+
+    selectWinningItem(finalAngle) {
+        if (this.callerItems.length === 0) return;
+        
+        // Normalize angle and calculate which segment was selected
+        const normalizedAngle = (360 - (finalAngle % 360)) % 360;
+        const itemsOnWheel = this.callerItems.length; // Use actual number of items
+        const segmentAngle = 360 / itemsOnWheel;
+        const selectedIndex = Math.floor(normalizedAngle / segmentAngle) % itemsOnWheel;
+        
+        // Get the selected item
+        const selectedItem = this.callerItems[selectedIndex];
+        
+        // Move item from caller items to called items
+        this.callerItems.splice(selectedIndex, 1);
+        this.calledItems.unshift(selectedItem); // Add to beginning for latest-first order
+        
+        // Update UI
+        this.updateCallerStats();
+        this.updateCalledItemsList();
+        this.createSpinningWheel(); // Recreate wheel without the called item
+        
+        // Show selection announcement
+        this.announceSelection(selectedItem);
+    }
+
+    announceSelection(item) {
+        // Create a temporary announcement
+        const announcement = document.createElement('div');
+        announcement.className = 'selection-announcement';
+        announcement.textContent = `Called: ${item}`;
+        announcement.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: white;
+            padding: 2rem 3rem;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px var(--shadow);
+            z-index: 1000;
+            animation: announceItem 3s ease;
+        `;
+        
+        // Add animation keyframes if not already added
+        if (!document.querySelector('#announce-animation')) {
+            const style = document.createElement('style');
+            style.id = 'announce-animation';
+            style.textContent = `
+                @keyframes announceItem {
+                    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+                    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+                    80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(announcement);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (announcement.parentNode) {
+                announcement.parentNode.removeChild(announcement);
+            }
+        }, 3000);
+    }
+
+    updateCallerStats() {
+        const remainingCount = document.getElementById('remainingCount');
+        remainingCount.textContent = `${this.callerItems.length} items remaining`;
+        
+        // Disable spin button if no items left
+        const spinButton = document.getElementById('spinButton');
+        if (this.callerItems.length === 0) {
+            spinButton.disabled = true;
+            spinButton.textContent = '🏁 DONE';
+        }
+    }
+
+    updateCalledItemsList() {
+        const calledItemsList = document.getElementById('calledItems');
+        calledItemsList.innerHTML = '';
+        
+        if (this.calledItems.length === 0) {
+            calledItemsList.innerHTML = '<div class="no-items">No items called yet</div>';
+            return;
+        }
+        
+        this.calledItems.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = index === 0 ? 'called-item latest-called' : 'called-item';
+            itemElement.textContent = item;
+            calledItemsList.appendChild(itemElement);
+        });
+    }
+
+    resetCaller() {
+        if (this.calledItems.length === 0) return;
+        
+        const confirmReset = confirm('Reset all items and start over? This will put all called items back into the pool.');
+        if (!confirmReset) return;
+        
+        // Move all called items back to caller items
+        this.callerItems = [...this.callerItems, ...this.calledItems];
+        this.calledItems = [];
+        
+        // Update UI
+        this.updateCallerStats();
+        this.updateCalledItemsList();
+        this.createSpinningWheel();
+        
+        // Re-enable spin button
+        const spinButton = document.getElementById('spinButton');
+        spinButton.disabled = false;
+        spinButton.textContent = '🎯 SPIN';
     }
 
     initializeThemeToggle() {

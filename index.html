@@ -81,27 +81,76 @@
             </div>
 
             <div id="player" class="tab-content">
-                <div class="upload-section" id="dropZone">
-                    <h2>Upload Your Bingo Card</h2>
-                    <div class="drag-drop-area">
-                        <div class="drag-drop-icon">📁</div>
-                        <p class="drag-drop-text">Drag & drop your bingo card files here</p>
-                        <p class="drag-drop-or">or</p>
-                        <button id="uploadButton" class="btn btn-primary">Choose Bingo Card File</button>
-                        <div id="fileName" class="file-name"></div>
-                        <small>Supports .html and .bingo files</small>
-                    </div>
-                    <input type="file" id="fileUpload" accept=".html,.bingo" style="display: none;">
+                <div class="player-modes">
+                    <button class="mode-button active" data-mode="play">🎯 Play Bingo</button>
+                    <button class="mode-button" data-mode="caller">📢 Caller Mode</button>
                 </div>
 
-                <div id="gameArea" class="game-area" style="display: none;">
-                    <div class="game-controls">
-                        <button id="resetGame" class="btn btn-secondary">Reset Game</button>
-                        <button id="checkWin" class="btn btn-success">Check for Bingo!</button>
-                        <div id="winStatus" class="win-status"></div>
+                <div id="play-mode" class="player-mode active">
+                    <div class="upload-section" id="dropZone">
+                        <h2>Upload Your Bingo Card</h2>
+                        <div class="drag-drop-area">
+                            <div class="drag-drop-icon">📁</div>
+                            <p class="drag-drop-text">Drag & drop your bingo card files here</p>
+                            <p class="drag-drop-or">or</p>
+                            <button id="uploadButton" class="btn btn-primary">Choose Bingo Card File</button>
+                            <div id="fileName" class="file-name"></div>
+                            <small>Supports .html and .bingo files</small>
+                        </div>
+                        <input type="file" id="fileUpload" accept=".html,.bingo" style="display: none;">
                     </div>
-                    
-                    <div id="playableCard" class="playable-card"></div>
+
+                    <div id="gameArea" class="game-area" style="display: none;">
+                        <div class="game-controls">
+                            <button id="resetGame" class="btn btn-secondary">Reset Game</button>
+                            <button id="checkWin" class="btn btn-success">Check for Bingo!</button>
+                            <div id="winStatus" class="win-status"></div>
+                        </div>
+                        
+                        <div id="playableCard" class="playable-card"></div>
+                    </div>
+                </div>
+
+                <div id="caller-mode" class="player-mode">
+                    <div class="caller-upload-section" id="callerDropZone">
+                        <h2>Load Bingo Items for Calling</h2>
+                        <div class="drag-drop-area">
+                            <div class="drag-drop-icon">🎲</div>
+                            <p class="drag-drop-text">Drag & drop a .bingo file here or click to browse</p>
+                            <p class="drag-drop-or">—————————— OR ——————————</p>
+                            <button id="callerUploadButton" class="btn btn-primary">Choose .bingo File</button>
+                            <div id="callerFileName" class="file-name"></div>
+                            <small>Only .bingo files contain the complete item list</small>
+                        </div>
+                        <input type="file" id="callerFileUpload" accept=".bingo" style="display: none;">
+                    </div>
+
+                    <div id="callerArea" class="caller-area" style="display: none;">
+                        <div class="caller-controls">
+                            <h3 id="callerTitle">Caller Mode</h3>
+                            <div class="caller-stats">
+                                <span id="remainingCount">0 items remaining</span>
+                                <button id="resetCaller" class="btn btn-secondary">Reset All Items</button>
+                            </div>
+                        </div>
+
+                        <div class="spinner-container" id="spinnerContainer">
+                            <div id="spinningWheel" class="spinning-wheel">
+                                <div class="wheel-center">
+                                    <div class="spin-button-container">
+                                        <button id="spinButton" class="spin-button">🎯 SPIN</button>
+                                    </div>
+                                </div>
+                                <div class="wheel-segments" id="wheelSegments"></div>
+                            </div>
+                            <div class="wheel-pointer">▼</div>
+                        </div>
+
+                        <div class="called-items-section">
+                            <h4>Called Items</h4>
+                            <div id="calledItems" class="called-items-list"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>

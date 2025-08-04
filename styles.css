@@ -1365,3 +1365,337 @@ main {
         color: white;
     }
 }
+
+/* Player Mode Tabs */
+.player-modes {
+    display: flex;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.mode-button {
+    background: none;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.mode-button:hover {
+    color: var(--text-primary);
+    background: var(--hover-bg);
+}
+
+.mode-button.active {
+    color: var(--border-focus);
+    border-bottom-color: var(--border-focus);
+    font-weight: 600;
+}
+
+.player-mode {
+    display: none;
+}
+
+.player-mode.active {
+    display: block;
+}
+
+/* Caller Mode Styles */
+.caller-area {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    --wheel-size: min(70vw, 500px);
+    --wheel-radius: calc(var(--wheel-size) / 2);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.caller-controls {
+    text-align: center;
+    flex-shrink: 0;
+    order: 1;
+}
+
+.caller-controls h3 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.caller-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.caller-stats span {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Spinning Wheel */
+.spinner-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 40px 20px;
+    order: 2;
+}
+
+.spinning-wheel {
+    position: relative;
+    width: var(--wheel-size);
+    height: var(--wheel-size);
+    max-width: calc(100vw - 80px);
+    max-height: 70vh;
+    border-radius: 50%;
+    border: 8px solid var(--border-color);
+    background: var(--card-bg);
+    box-shadow: 0 0 20px var(--shadow);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    transform-origin: center center;
+}
+
+.spinning-wheel.spinning {
+    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99) !important;
+}
+
+.wheel-segments {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.wheel-segment {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    height: 2px;
+    transform-origin: 0% 0%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 10px 20px 0 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    word-wrap: break-word;
+    text-align: center;
+    overflow: visible;
+    white-space: nowrap;
+}
+
+.wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(120px, 20%);
+    height: min(120px, 20%);
+    background: var(--card-bg);
+    border: 6px solid var(--border-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px var(--shadow);
+    z-index: 10;
+}
+
+.spin-button {
+    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    aspect-ratio: 1 / 1;
+}
+
+.spin-button:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.spin-button:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-25%);
+    font-size: 3rem;
+    color: var(--border-focus);
+    z-index: 15;
+    filter: drop-shadow(0 2px 4px var(--shadow));
+    text-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+/* Called Items */
+.called-items-section {
+    text-align: center;
+    flex-shrink: 0;
+    order: 3;
+}
+
+.called-items-section h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.called-items-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--card-bg);
+}
+
+.called-item {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+}
+
+.latest-called {
+    background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+    color: white;
+    animation: highlight 2s ease;
+}
+
+@keyframes highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Responsive design for caller mode */
+@media (max-width: 768px) {
+    .caller-area {
+        --wheel-size: min(75vw, 350px);
+        gap: 30px;
+        padding: 0 15px;
+    }
+    
+    .spinner-container {
+        padding: 30px 15px;
+    }
+    
+    .spinning-wheel {
+        max-width: calc(100vw - 60px);
+        max-height: 60vh;
+    }
+    
+    .wheel-center {
+        width: min(100px, 20%);
+        height: min(100px, 20%);
+    }
+    
+    .spin-button {
+        width: 75px;
+        height: 75px;
+        font-size: 0.7rem;
+    }
+    
+    .wheel-pointer {
+        top: 0;
+        font-size: 2.5rem;
+    }
+    
+    .wheel-segments text {
+        font-size: min(10px, 2vw);
+    }
+    
+    .caller-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .player-modes {
+        flex-direction: column;
+    }
+    
+    .mode-button {
+        padding: 0.8rem 1rem;
+        border-bottom: none;
+        border-right: 3px solid transparent;
+    }
+    
+    .mode-button.active {
+        border-bottom: none;
+        border-right-color: var(--border-focus);
+    }
+}
+
+@media (max-width: 480px) {
+    .caller-area {
+        --wheel-size: min(80vw, 280px);
+        gap: 25px;
+        padding: 0 10px;
+    }
+    
+    .spinner-container {
+        padding: 25px 10px;
+    }
+    
+    .spinning-wheel {
+        max-width: calc(100vw - 40px);
+        max-height: 50vh;
+    }
+    
+    .wheel-center {
+        width: min(80px, 18%);
+        height: min(80px, 18%);
+    }
+    
+    .spin-button {
+        width: 60px;
+        height: 60px;
+        font-size: 0.6rem;
+    }
+    
+    .wheel-pointer {
+        top: 0;
+        font-size: 2rem;
+    }
+    
+    .wheel-segments text {
+        font-size: min(8px, 1.5vw);
+    }
+}

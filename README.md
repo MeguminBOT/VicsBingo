@@ -21,6 +21,7 @@ A modern, responsive web application for generating and playing custom bingo car
 - **Multiple File Support**: Load cards from HTML or custom .bingo format files
 - **Card Selection**: Choose from multiple cards when uploading multi-card files
 - **Game Reset**: Easily reset game state to start over
+- **Caller Mode**: Built-in spinning wheel for calling out items during games
 
 ### 📱 Modern User Experience
 - **Dark Mode**: Toggle between light and dark themes with preference saving
@@ -58,6 +59,13 @@ A modern, responsive web application for generating and playing custom bingo car
 2. Upload a bingo card file (HTML or .bingo format)
 3. Click cells to mark them as called
 4. The game automatically detects when you have bingo!
+
+### Caller Mode (Host a Game)
+1. Switch to the "Play Bingo" tab and select "Caller Mode"
+2. Upload a .bingo file (contains the complete item list)
+3. Use the spinning wheel to randomly select and call out items
+4. Track all called items in the list below the wheel
+5. Reset to start over or continue until all items are called
 
 ### Traditional Bingo Mode
 The Traditional Bingo mode creates authentic bingo cards with numbers distributed according to classic bingo rules:
@@ -107,6 +115,7 @@ Bingo-Card-Generator/
 - **Holiday Fun**: Seasonal bingo cards for holidays and special occasions
 - **Virtual Events**: Share .bingo files for remote play sessions
 - **Corporate Training**: Interactive learning and ice breaker activities
+- **Game Hosting**: Use caller mode to host bingo games with the built-in spinning wheel
 
 ## 📱 Mobile Features
 
@@ -124,6 +133,8 @@ Bingo-Card-Generator/
 - **Smart Validation**: Generate cards with any number of items, with helpful warnings
 - **Flexible Generation**: Intelligent item repetition and shuffling when needed
 - **Improved Terminology**: Updated UI text for clarity ("Minimum recommended" vs "Required")
+- **Caller Mode**: Built-in spinning wheel for hosting bingo games
+- **Enhanced .bingo Format**: Now includes complete item lists for caller functionality
 
 ### v1.0.0
 - Initial release with full feature set
