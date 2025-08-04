@@ -1,12 +1,16 @@
 # 🎯 Vic's Bingo Card Generator
 
-A simple but modern, responsive web application for generating and playing custom bingo cards. Create unlimited unique bingo cards with your own content and play them directly in your browser!
+A modern, responsive web application for generating and playing custom bingo cards. Create unlimited unique bingo cards with your own content and play them directly in your browser!
 
 ## 🌟 Features
 
 ### 🎨 Card Generation
 - **Flexible Grid Sizes**: Create bingo cards from 3x3 up to 10x10
-- **Custom Content**: Add your own text for each cell
+- **Two Generation Modes**:
+  - **Random Pool Mode**: Enter a list of items that will be randomly distributed across different cards
+  - **Traditional Bingo Mode**: Auto-generated with classic bingo numbers (1-75) distributed across B-I-N-G-O columns
+- **Smart Validation**: Generate cards with any number of items - warnings and confirmations for optimal card variety
+- **Dynamic Input Area**: Always-visible input that updates based on your settings
 - **Multiple Cards**: Generate up to 50 unique cards at once
 - **Custom Titles**: Add personalized titles to your bingo cards
 - **Free Center Square**: Customizable center square text for odd-sized grids
@@ -36,15 +40,34 @@ A simple but modern, responsive web application for generating and playing custo
 ### Quick Start
 1. Open `index.html` in your web browser
 2. Choose your card size and number of cards to generate
-3. Click "Generate Input Grid" and fill in your bingo items
-4. Click "Generate Cards & Show Preview" to create your cards
-5. Download individual cards or bulk zip files
+3. Choose your generation mode:
+   - **Random Pool**: Enter a list of items (one per line) to be randomly distributed across cards
+   - **Traditional Bingo**: Click "Traditional Bingo" button for auto-generated B-I-N-G-O number cards
+4. The input area updates dynamically based on your settings and shows minimum recommended items
+5. Click "Generate Cards & Show Preview" to create your cards
+6. Download individual cards or bulk zip files
+
+### Smart Generation
+- **Flexible Item Count**: Generate cards with any number of items
+- **Automatic Warnings**: Get notified if you have fewer than the recommended number of items
+- **Confirmation Dialogs**: Choose to proceed with fewer items if desired
+- **Item Repetition**: When needed, items are intelligently repeated and shuffled for variety
 
 ### Playing Bingo
 1. Switch to the "Play Bingo" tab
 2. Upload a bingo card file (HTML or .bingo format)
 3. Click cells to mark them as called
 4. The game automatically detects when you have bingo!
+
+### Traditional Bingo Mode
+The Traditional Bingo mode creates authentic bingo cards with numbers distributed according to classic bingo rules:
+- **B Column**: Numbers 1-15
+- **I Column**: Numbers 16-30  
+- **N Column**: Numbers 31-45 (with FREE center)
+- **G Column**: Numbers 46-60
+- **O Column**: Numbers 61-75
+
+This mode automatically sets your grid to 5×5 and generates the complete set of 75 traditional bingo numbers for authentic gameplay.
 
 ## 🛠️ Technical Features
 
@@ -77,11 +100,13 @@ Bingo-Card-Generator/
 
 ## 🎯 Use Cases
 
-- **Party Games**: Create themed bingo for parties, events, or gatherings
-- **Educational**: Make learning bingo for classrooms or training
-- **Corporate Events**: Team building activities and ice breakers
-- **Holiday Fun**: Seasonal bingo cards for holidays and celebrations
+- **Custom Themed Bingo**: Create bingo cards with your own topics and items
+- **Traditional Number Bingo**: Use traditional mode for classic B-I-N-G-O number games
+- **Educational Games**: Make learning bingo for classrooms or training sessions
+- **Party & Events**: Themed bingo for parties, celebrations, or team building
+- **Holiday Fun**: Seasonal bingo cards for holidays and special occasions
 - **Virtual Events**: Share .bingo files for remote play sessions
+- **Corporate Training**: Interactive learning and ice breaker activities
 
 ## 📱 Mobile Features
 
@@ -92,7 +117,15 @@ Bingo-Card-Generator/
 
 ## 🔄 Version History
 
-### v1.0.0 (Current)
+### v2.0.0 (Current)
+- **Simplified Interface**: Removed redundant "Same Items" mode for cleaner UX
+- **Always-Visible Input**: Dynamic input area that updates based on settings
+- **Traditional Bingo Mode**: Auto-generated B-I-N-G-O number cards (1-75)
+- **Smart Validation**: Generate cards with any number of items, with helpful warnings
+- **Flexible Generation**: Intelligent item repetition and shuffling when needed
+- **Improved Terminology**: Updated UI text for clarity ("Minimum recommended" vs "Required")
+
+### v1.0.0
 - Initial release with full feature set
 - Dark mode support
 - Mobile responsiveness

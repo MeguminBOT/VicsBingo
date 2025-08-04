@@ -6,10 +6,12 @@ class BingoCardGenerator {
         this.cardTitle = '';
         this.outputFormat = 'bingo';
         this.inputValues = [];
+        this.isTraditionalMode = false; // Track traditional bingo mode
         this.initializeEventListeners();
         this.initializeTabs();
         this.initializeGamePlayer();
         this.initializeThemeToggle();
+        this.initializeInputArea(); // Always show input area
     }
 
     initializeTabs() {
@@ -129,6 +131,7 @@ class BingoCardGenerator {
     initializeEventListeners() {
         document.getElementById('cardSize').addEventListener('change', (e) => {
             this.cardSize = parseInt(e.target.value);
+            this.updateInputArea(); // Update the input area when card size changes
         });
 
         document.getElementById('numCards').addEventListener('change', (e) => {
@@ -137,14 +140,15 @@ class BingoCardGenerator {
 
         document.getElementById('freeText').addEventListener('input', (e) => {
             this.freeText = e.target.value.trim() || 'FREE';
+            this.updateInputArea(); // Update the input area when free text changes
         });
 
         document.getElementById('cardTitle').addEventListener('input', (e) => {
             this.cardTitle = e.target.value.trim();
         });
 
-        document.getElementById('generateGrid').addEventListener('click', () => {
-            this.generateInputGrid();
+        document.getElementById('traditionalMode').addEventListener('click', () => {
+            this.generateTraditionalBingo();
         });
 
         document.getElementById('generateCards').addEventListener('click', () => {
@@ -152,47 +156,195 @@ class BingoCardGenerator {
         });
     }
 
+    initializeInputArea() {
+        // Always show the input area on page load
+        const gridContainer = document.getElementById('inputGrid');
+        const generateSection = document.getElementById('generateSection');
+        
+        generateSection.style.display = 'block';
+        this.generateInputGrid();
+    }
+
+    updateInputArea() {
+        // Reset traditional mode when updating input area (user is making changes)
+        this.isTraditionalMode = false;
+        
+        // Update the instructions dynamically when settings change
+        const instructionsDiv = document.querySelector('.random-pool-instructions');
+        if (instructionsDiv) {
+            const totalCells = this.cardSize * this.cardSize;
+            const centerCell = this.cardSize % 2 === 1 ? 1 : 0;
+            const requiredItems = totalCells - centerCell;
+            const recommendedItems = Math.max(requiredItems + 10, Math.floor(requiredItems * 1.5));
+
+            instructionsDiv.innerHTML = `
+                <h3>🎯 Bingo Card Generator</h3>
+                <p>Enter a list of items (one per line) that will be randomly distributed across different cards.</p>
+                <div class="pool-stats">
+                    <strong>Grid Size:</strong> ${this.cardSize}×${this.cardSize} (${totalCells} cells total)<br>
+                    <strong>Minimum recommended:</strong> At least ${requiredItems} items${centerCell ? ' (center square will be "' + this.freeText + '")' : ''}<br>
+                    <strong>Recommended:</strong> ${recommendedItems}+ items for good variety between cards
+                </div>
+            `;
+        }
+
+        // Update the counter
+        const textarea = document.getElementById('randomPoolItems');
+        if (textarea) {
+            const event = new Event('input');
+            textarea.dispatchEvent(event);
+        }
+    }
+
     generateInputGrid() {
         const gridContainer = document.getElementById('inputGrid');
         const generateSection = document.getElementById('generateSection');
         
         gridContainer.innerHTML = '';
-        gridContainer.style.gridTemplateColumns = `repeat(${this.cardSize}, 1fr)`;
-        gridContainer.setAttribute('data-size', this.cardSize);
-        
-        const totalCells = this.cardSize * this.cardSize;
-        const centerIndex = Math.floor(totalCells / 2);
-        
-        for (let i = 0; i < totalCells; i++) {
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = i === centerIndex && this.cardSize % 2 === 1 ? this.freeText : `Item ${i + 1}`;
-            input.dataset.index = i;
-            
-            if (i === centerIndex && this.cardSize % 2 === 1) {
-                input.value = this.freeText;
-                input.classList.add('center-cell');
-                input.readOnly = true;
-            }
-            
-            gridContainer.appendChild(input);
-        }
-        
         generateSection.style.display = 'block';
         document.getElementById('preview').innerHTML = '';
+
+        // Always use the random pool input format
+        this.generateRandomPoolGrid(gridContainer);
+    }
+
+    generateRandomPoolGrid(gridContainer) {
+        gridContainer.className = 'random-pool-input';
+        gridContainer.style.gridTemplateColumns = '1fr';
+        gridContainer.removeAttribute('data-size');
+        
+        const totalCells = this.cardSize * this.cardSize;
+        const centerCell = this.cardSize % 2 === 1 ? 1 : 0; // 1 if odd size (has center), 0 if even
+        const requiredItems = totalCells - centerCell;
+        const recommendedItems = Math.max(requiredItems + 10, Math.floor(requiredItems * 1.5));
+
+        const instructionsDiv = document.createElement('div');
+        instructionsDiv.className = 'random-pool-instructions';
+        instructionsDiv.innerHTML = `
+            <h3>🎯 Bingo Card Generator</h3>
+            <p>Enter a list of items (one per line) that will be randomly distributed across different cards.</p>
+            <div class="pool-stats">
+                <strong>Grid Size:</strong> ${this.cardSize}×${this.cardSize} (${totalCells} cells total)<br>
+                <strong>Minimum recommended:</strong> At least ${requiredItems} items${centerCell ? ' (center square will be "' + this.freeText + '")' : ''}<br>
+                <strong>Recommended:</strong> ${recommendedItems}+ items for good variety between cards
+            </div>
+        `;
+        gridContainer.appendChild(instructionsDiv);
+
+        const textarea = document.createElement('textarea');
+        textarea.id = 'randomPoolItems';
+        textarea.className = 'random-pool-textarea';
+        textarea.placeholder = `Enter your items here (one per line):\n\nExample:\nApple\nBanana\nCherry\nDate\nEggplant\nFig\nGrape\n...`;
+        textarea.rows = Math.max(10, Math.min(20, recommendedItems));
+        gridContainer.appendChild(textarea);
+
+        const counterDiv = document.createElement('div');
+        counterDiv.className = 'item-counter';
+        counterDiv.innerHTML = `<span id="itemCount">0</span> items entered (minimum: ${requiredItems})`;
+        gridContainer.appendChild(counterDiv);
+
+        // Add real-time counter
+        textarea.addEventListener('input', () => {
+            const items = this.parseRandomPoolItems(textarea.value);
+            const countElement = document.getElementById('itemCount');
+            countElement.textContent = items.length;
+            
+            if (items.length < requiredItems) {
+                counterDiv.className = 'item-counter insufficient';
+            } else if (items.length < recommendedItems) {
+                counterDiv.className = 'item-counter sufficient';
+            } else {
+                counterDiv.className = 'item-counter optimal';
+            }
+        });
+    }
+
+    parseRandomPoolItems(text) {
+        return text.split('\n')
+            .map(item => item.trim())
+            .filter(item => item.length > 0 && item !== this.freeText);
+    }
+
+    generateTraditionalBingo() {
+        // Set to 5x5 for traditional bingo if not already
+        if (this.cardSize !== 5) {
+            this.cardSize = 5;
+            document.getElementById('cardSize').value = '5';
+        }
+
+        // Set traditional FREE text
+        this.freeText = 'FREE';
+        document.getElementById('freeText').value = 'FREE';
+
+        // Set traditional mode flag
+        this.isTraditionalMode = true;
+
+        // Generate traditional bingo numbers (1-75 distributed across B-I-N-G-O columns)
+        const bingoNumbers = this.generateTraditionalBingoNumbers();
+        
+        // Fill the textarea with traditional bingo numbers
+        const textarea = document.getElementById('randomPoolItems');
+        if (textarea) {
+            textarea.value = bingoNumbers.join('\n');
+            
+            // Trigger the counter update
+            const event = new Event('input');
+            textarea.dispatchEvent(event);
+        }
+
+        // Update the instructions to show traditional mode
+        const instructionsDiv = document.querySelector('.random-pool-instructions');
+        if (instructionsDiv) {
+            instructionsDiv.innerHTML = `
+                <h3>🎲 Traditional Bingo Mode</h3>
+                <p>Auto-generated with traditional bingo numbers (1-75) distributed across B-I-N-G-O columns.</p>
+                <div class="pool-stats">
+                    <strong>B Column:</strong> 1-15 | <strong>I Column:</strong> 16-30 | <strong>N Column:</strong> 31-45 | <strong>G Column:</strong> 46-60 | <strong>O Column:</strong> 61-75<br>
+                    <strong>Grid Size:</strong> 5×5 (25 cells total with FREE center)<br>
+                    <strong>Pool Size:</strong> 75 traditional bingo numbers
+                </div>
+            `;
+        }
+    }
+
+    generateTraditionalBingoNumbers() {
+        // Traditional bingo uses 75 numbers distributed across columns:
+        // B: 1-15, I: 16-30, N: 31-45, G: 46-60, O: 61-75
+        const numbers = [];
+        
+        // B column (1-15)
+        for (let i = 1; i <= 15; i++) {
+            numbers.push(`B${i}`);
+        }
+        
+        // I column (16-30)
+        for (let i = 16; i <= 30; i++) {
+            numbers.push(`I${i}`);
+        }
+        
+        // N column (31-45)
+        for (let i = 31; i <= 45; i++) {
+            numbers.push(`N${i}`);
+        }
+        
+        // G column (46-60)
+        for (let i = 46; i <= 60; i++) {
+            numbers.push(`G${i}`);
+        }
+        
+        // O column (61-75)
+        for (let i = 61; i <= 75; i++) {
+            numbers.push(`O${i}`);
+        }
+        
+        return numbers;
     }
 
     collectInputValues() {
-        const inputs = document.querySelectorAll('#inputGrid input');
-        const values = [];
+        const textarea = document.getElementById('randomPoolItems');
+        if (!textarea) return [];
         
-        inputs.forEach(input => {
-            if (input.value.trim()) {
-                values.push(input.value.trim());
-            }
-        });
-        
-        return values;
+        return this.parseRandomPoolItems(textarea.value);
     }
 
     shuffleArray(array) {
@@ -205,13 +357,91 @@ class BingoCardGenerator {
     }
 
     generateSingleCard(values, cardNumber) {
+        // Check if we're in traditional bingo mode by looking at the values
+        const isTraditionalBingo = this.isTraditionalMode && values.length === 75 && 
+                                   values.every(v => v.match(/^[BINGO]\d+$/));
+        
+        if (isTraditionalBingo) {
+            return this.generateTraditionalBingoCard(values, cardNumber);
+        } else {
+            return this.generateRandomCard(values, cardNumber);
+        }
+    }
+
+    generateTraditionalBingoCard(values, cardNumber) {
+        // Traditional bingo is always 5x5 with center FREE
+        const cardValues = [];
+        
+        // Separate numbers by column
+        const bNumbers = values.filter(v => v.startsWith('B')); // B1-B15
+        const iNumbers = values.filter(v => v.startsWith('I')); // I16-I30
+        const nNumbers = values.filter(v => v.startsWith('N')); // N31-N45
+        const gNumbers = values.filter(v => v.startsWith('G')); // G46-G60
+        const oNumbers = values.filter(v => v.startsWith('O')); // O61-O75
+        
+        // Shuffle each column's numbers
+        const shuffledB = this.shuffleArray(bNumbers).slice(0, 5); // 5 numbers for B column
+        const shuffledI = this.shuffleArray(iNumbers).slice(0, 5); // 5 numbers for I column
+        const shuffledN = this.shuffleArray(nNumbers).slice(0, 4); // 4 numbers for N column (center is FREE)
+        const shuffledG = this.shuffleArray(gNumbers).slice(0, 5); // 5 numbers for G column
+        const shuffledO = this.shuffleArray(oNumbers).slice(0, 5); // 5 numbers for O column
+        
+        // Build the card row by row, column by column
+        for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 5; col++) {
+                if (row === 2 && col === 2) {
+                    // Center square is always FREE
+                    cardValues.push(this.freeText);
+                } else if (col === 0) {
+                    // B column
+                    cardValues.push(shuffledB[row]);
+                } else if (col === 1) {
+                    // I column
+                    cardValues.push(shuffledI[row]);
+                } else if (col === 2) {
+                    // N column - skip center (row 2)
+                    const nIndex = row < 2 ? row : row - 1;
+                    cardValues.push(shuffledN[nIndex]);
+                } else if (col === 3) {
+                    // G column
+                    cardValues.push(shuffledG[row]);
+                } else {
+                    // O column
+                    cardValues.push(shuffledO[row]);
+                }
+            }
+        }
+        
+        return this.createCardHTML(cardValues, cardNumber);
+    }
+
+    generateRandomCard(values, cardNumber) {
         const totalCells = this.cardSize * this.cardSize;
         const centerIndex = Math.floor(totalCells / 2);
         const isOddSize = this.cardSize % 2 === 1;
         
         // Filter out the custom FREE text from values and shuffle
         const availableValues = values.filter(v => v !== this.freeText);
-        const shuffledValues = this.shuffleArray(availableValues);
+        
+        // If we don't have enough unique values, we'll need to repeat some
+        const requiredValues = totalCells - (isOddSize ? 1 : 0);
+        let valuesToUse = [];
+        
+        if (availableValues.length >= requiredValues) {
+            // We have enough unique values
+            valuesToUse = this.shuffleArray(availableValues).slice(0, requiredValues);
+        } else {
+            // We need to repeat some values
+            valuesToUse = [];
+            const shuffledValues = this.shuffleArray(availableValues);
+            
+            for (let i = 0; i < requiredValues; i++) {
+                valuesToUse.push(shuffledValues[i % shuffledValues.length]);
+            }
+            
+            // Shuffle again to distribute the repeated items randomly
+            valuesToUse = this.shuffleArray(valuesToUse);
+        }
         
         // Create card array
         const cardValues = [];
@@ -221,14 +451,8 @@ class BingoCardGenerator {
             if (i === centerIndex && isOddSize) {
                 cardValues.push(this.freeText);
             } else {
-                if (valueIndex < shuffledValues.length) {
-                    cardValues.push(shuffledValues[valueIndex]);
-                    valueIndex++;
-                } else {
-                    // If we run out of unique values, start reusing them
-                    cardValues.push(shuffledValues[valueIndex % shuffledValues.length]);
-                    valueIndex++;
-                }
+                cardValues.push(valuesToUse[valueIndex]);
+                valueIndex++;
             }
         }
         
@@ -556,8 +780,27 @@ class BingoCardGenerator {
         const values = this.collectInputValues();
         
         if (values.length === 0) {
-            alert('Please fill in at least one cell!');
+            alert('Please fill in at least one item!');
             return;
+        }
+
+        // Validate and warn about item count
+        const totalCells = this.cardSize * this.cardSize;
+        const centerCell = this.cardSize % 2 === 1 ? 1 : 0;
+        const requiredItems = totalCells - centerCell;
+        const recommendedItems = Math.max(requiredItems + 10, Math.floor(requiredItems * 1.5));
+        
+        if (values.length < requiredItems) {
+            const shortage = requiredItems - values.length;
+            const proceed = confirm(`⚠️ Warning: You only have ${values.length} items, but need at least ${requiredItems} for a ${this.cardSize}×${this.cardSize} grid.\n\nThis means ${shortage} items will be repeated on each card.\n\nDo you want to proceed anyway?`);
+            if (!proceed) {
+                return;
+            }
+        } else if (values.length < recommendedItems) {
+            const proceed = confirm(`💡 Recommendation: You have ${values.length} items, but we recommend ${recommendedItems}+ items for a ${this.cardSize}×${this.cardSize} grid to ensure good variety between cards.\n\nYour cards will still work, but may have more repeated items.\n\nDo you want to proceed?`);
+            if (!proceed) {
+                return;
+            }
         }
         
         const loadingSpinner = document.getElementById('loadingSpinner');
@@ -577,6 +820,18 @@ class BingoCardGenerator {
             
             // Show preview with individual download buttons
             const previewSection = document.getElementById('preview');
+            
+            // Create description based on item count
+            const totalCells = this.cardSize * this.cardSize;
+            const centerCell = this.cardSize % 2 === 1 ? 1 : 0;
+            const requiredItems = totalCells - centerCell;
+            
+            let modeDescription = 'Each card has randomly selected items from your pool';
+            if (values.length < requiredItems) {
+                const repeatedItems = requiredItems - values.length;
+                modeDescription += ` (${repeatedItems} items repeated per card due to limited pool size)`;
+            }
+            
             const previewCards = cardsHTML.map((cardHTML, index) => {
                 const cardNumber = index + 1;
                 return `
@@ -595,7 +850,8 @@ class BingoCardGenerator {
             }).join('');
             
             previewSection.innerHTML = `
-                <h2>All Generated Cards (${this.numCards} total)</h2>
+                <h2>Generated Cards (${this.numCards} total)</h2>
+                <p class="mode-description"><strong>Mode:</strong> 🎲 Random Pool - ${modeDescription}</p>
                 <div class="preview-grid">
                     ${previewCards}
                 </div>
@@ -653,7 +909,7 @@ class BingoCardGenerator {
             
         } catch (error) {
             console.error('Error generating cards:', error);
-            alert('An error occurred while generating the cards. Please try again.');
+            alert('An error occurred while generating the cards: ' + error.message);
         } finally {
             // Hide loading state
             loadingSpinner.style.display = 'none';
@@ -919,16 +1175,41 @@ Generated on: ${new Date().toLocaleString()}
     }
 
     generateSingleCardData(values, cardNumber) {
+        // Check if we're in traditional bingo mode
+        const isTraditionalBingo = this.isTraditionalMode && values.length === 75 && 
+                                   values.every(v => v.match(/^[BINGO]\d+$/));
+        
+        if (isTraditionalBingo) {
+            return this.generateTraditionalBingoCardData(values, cardNumber);
+        }
+        
         const totalCells = this.cardSize * this.cardSize;
         const centerIndex = Math.floor(totalCells / 2);
         const isOddSize = this.cardSize % 2 === 1;
         
-        // Filter out the custom FREE text from values and shuffle
+        // For random mode, shuffle and distribute
         const availableValues = values.filter(v => v !== this.freeText);
-        const shuffledValues = this.shuffleArray(availableValues);
+        const requiredValues = totalCells - (isOddSize ? 1 : 0);
         
-        // Create card array
-        const cardValues = [];
+        let valuesToUse = [];
+        
+        if (availableValues.length >= requiredValues) {
+            // We have enough unique values
+            valuesToUse = this.shuffleArray(availableValues).slice(0, requiredValues);
+        } else {
+            // We need to repeat some values
+            valuesToUse = [];
+            const shuffledValues = this.shuffleArray(availableValues);
+            
+            for (let i = 0; i < requiredValues; i++) {
+                valuesToUse.push(shuffledValues[i % shuffledValues.length]);
+            }
+            
+            // Shuffle again to distribute the repeated items randomly
+            valuesToUse = this.shuffleArray(valuesToUse);
+        }
+        
+        let cardValues = [];
         let valueIndex = 0;
         
         for (let i = 0; i < totalCells; i++) {
@@ -939,28 +1220,92 @@ Generated on: ${new Date().toLocaleString()}
                     checked: true // Center is pre-checked
                 });
             } else {
-                if (valueIndex < shuffledValues.length) {
-                    cardValues.push({
-                        content: shuffledValues[valueIndex],
-                        isCenter: false,
-                        checked: false
-                    });
-                    valueIndex++;
-                } else {
-                    // If we run out of unique values, start reusing them
-                    cardValues.push({
-                        content: shuffledValues[valueIndex % shuffledValues.length],
-                        isCenter: false,
-                        checked: false
-                    });
-                    valueIndex++;
-                }
+                cardValues.push({
+                    content: valuesToUse[valueIndex],
+                    isCenter: false,
+                    checked: false
+                });
+                valueIndex++;
             }
         }
         
         return {
             cardNumber: cardNumber,
             gridSize: this.cardSize,
+            cells: cardValues
+        };
+    }
+
+    generateTraditionalBingoCardData(values, cardNumber) {
+        // Separate numbers by column
+        const bNumbers = values.filter(v => v.startsWith('B')); // B1-B15
+        const iNumbers = values.filter(v => v.startsWith('I')); // I16-I30
+        const nNumbers = values.filter(v => v.startsWith('N')); // N31-N45
+        const gNumbers = values.filter(v => v.startsWith('G')); // G46-G60
+        const oNumbers = values.filter(v => v.startsWith('O')); // O61-O75
+        
+        // Shuffle each column's numbers
+        const shuffledB = this.shuffleArray(bNumbers).slice(0, 5);
+        const shuffledI = this.shuffleArray(iNumbers).slice(0, 5);
+        const shuffledN = this.shuffleArray(nNumbers).slice(0, 4);
+        const shuffledG = this.shuffleArray(gNumbers).slice(0, 5);
+        const shuffledO = this.shuffleArray(oNumbers).slice(0, 5);
+        
+        const cardValues = [];
+        
+        // Build the card row by row, column by column
+        for (let row = 0; row < 5; row++) {
+            for (let col = 0; col < 5; col++) {
+                if (row === 2 && col === 2) {
+                    // Center square is always FREE
+                    cardValues.push({
+                        content: this.freeText,
+                        isCenter: true,
+                        checked: true
+                    });
+                } else if (col === 0) {
+                    // B column
+                    cardValues.push({
+                        content: shuffledB[row],
+                        isCenter: false,
+                        checked: false
+                    });
+                } else if (col === 1) {
+                    // I column
+                    cardValues.push({
+                        content: shuffledI[row],
+                        isCenter: false,
+                        checked: false
+                    });
+                } else if (col === 2) {
+                    // N column - skip center (row 2)
+                    const nIndex = row < 2 ? row : row - 1;
+                    cardValues.push({
+                        content: shuffledN[nIndex],
+                        isCenter: false,
+                        checked: false
+                    });
+                } else if (col === 3) {
+                    // G column
+                    cardValues.push({
+                        content: shuffledG[row],
+                        isCenter: false,
+                        checked: false
+                    });
+                } else {
+                    // O column
+                    cardValues.push({
+                        content: shuffledO[row],
+                        isCenter: false,
+                        checked: false
+                    });
+                }
+            }
+        }
+        
+        return {
+            cardNumber: cardNumber,
+            gridSize: 5, // Traditional bingo is always 5x5
             cells: cardValues
         };
     }
